@@ -2,6 +2,8 @@
 
 from datetime import date
 
+from inspect import get_annotations
+
 from sqlalchemy import ForeignKey
 from sqlalchemy import String, Integer, Float
 from sqlalchemy import JSON, ARRAY
@@ -29,7 +31,7 @@ def log_setup() -> JLLogger:
 
 logger = log_setup()
 
-class Annotation_Base(DeclarativeBase):
+class AnnotationBase(DeclarativeBase):
 
     logger.debug(f'seting type annotation_map:')
     type_annotation_map = {
@@ -43,22 +45,24 @@ class Annotation_Base(DeclarativeBase):
         list[float_2]: ARRAY(Float)
     }    
 
-class Base(Annotation_Base):
+class Base(AnnotationBase):
     def __init__(self):
         super().__init__()
-
-    __tablename__ = "base"
+    
+    __abstract__ = True
+    #__tablename__ = "base"
 
     logger.debug(f'creating default columns')
-    purchase_date: Mapped[date] = mapped_column(primary_key=True)
+    
     production_year: Mapped[year]
     manufacturer: Mapped[str_20]
     model_name: Mapped[str_20]
-    stamped_codes: Mapped[list[str]]
-    material: Mapped[str_20]
+    stamped_codes: Mapped[dict[str, Any]]
     style: Mapped[str_20]
 
-    weight_g: Mapped[float_2]
+    #built_weight_kg: Mapped[float_2]
+    purchase_date: Mapped[date]
+    purchase_price: Mapped[float_2]
     value_low_usd: Mapped[float_2]
     value_avg_usd: Mapped[float_2]
     value_high_usd: Mapped[float_2]
@@ -66,28 +70,15 @@ class Base(Annotation_Base):
     _locals = locals()
 
     def _set_repr(self) -> None:
-        _annotations = self._locals['__annotations__']        
+        _annotations = self.__annotations__
+        _annotations.update(self._locals['__annotations__'])
         repr_head = f"<{self.__class__.__name__}("
+        repr_body_list = [f'{k}={v}' for k, v in _annotations.items()]
         repr_body_list = [f'{k}={v}' for k, v in _annotations.items()]
         repr_body = ','.join(repr_body_list)
         repr_tail = ')>'
         repr = ''.join([repr_head, repr_body, repr_tail])
         return repr
-
-    def __repr__(self):
-        return self._set_repr()
-        
-
-class Bike(Base):
-    def __init__(self):
-        super().__init__()
-    
-    __tablename__ = "bikes"
-
-    purchase_date: Mapped[date] = mapped_column(ForeignKey("base.purchase_date"))
-    frame_serial: Mapped[str_20] = mapped_column(primary_key=True)
-    frame_size_cm: Mapped[float_2]
-    frame_material: Mapped[str_10]
 
     def __repr__(self):
         return self._set_repr()
@@ -99,16 +90,19 @@ class Frame(Base):
     __tablename__ = "frames"
 
     # Basic attributes
-    purchase_date: Mapped[date] = mapped_column(ForeignKey('base.purchase_date'))
-    serial: Mapped[str_20] = mapped_column(ForeignKey('bikes.frame_serial'), primary_key=True)
+    serial: Mapped[str_20] = mapped_column(primary_key=True)
     serial_location: Mapped[str_20]
+    #stamped_codes: Mapped[dict[str, Any]]
+    brand: Mapped[str_20]
+    #manufacturer: Mapped[str_20]
+    #production_year: Mapped[year]
     model_year: Mapped[int]
     model_name: Mapped[str_20]
-    builder: Mapped[str_20]
+    #style: Mapped[str_20]
+    
     material: Mapped[str_20]
     material_manufacturer: Mapped[str_20]
-    
-    tube_set: Mapped[str_20]
+    material_tier: Mapped[str_20]
     dropout_manufacturer: Mapped[str_20]
     dropout_type: Mapped[str_20]
     dropout_model: Mapped[str_20]
@@ -152,35 +146,47 @@ class Frame(Base):
     weight_spec_g: Mapped[float_2]
     weight_actual_g: Mapped[float_2]
 
+    #purchase_date: Mapped[date]
+    #purchase_price: Mapped[float_2]
+    
+    #value_low_usd: Mapped[float_2]
+    #value_avg_usd: Mapped[float_2]
+    #value_high_usd: Mapped[float_2]
+
     def __repr__(self):
         return self._set_repr()
 
+class Fork(Base):
+    __tablename__ = "forks"
 
     
-# class Fork(Base):
-#     __tablename__ = "forks"
-
-#     frame_serial: Mapped[str] = self._string_primary
-#     production_year: Mapped[int] = self._integer
-#     manufacturer: Mapped[str] = self._string_20
-#     model_name: Mapped[str] = self._string_20
-#     stamped_codes: Mapped[ARRAY] = self._array
-#     material: Mapped[str] = self._string_20
+    #purchase_date: Mapped[date]
+    #production_year: Mapped[year]
+    stamped_codes: Mapped[dict[str, Any]] = mapped_column(primary_key=True)
+    frame_serial: Mapped[str_20] = mapped_column(ForeignKey('frames.serial'))
+    #production_year: Mapped[int]
+    #manufacturer: Mapped[str_20]
+    #model_name: Mapped[str_20]
+    material: Mapped[str_20]
+    #style: Mapped[str_20]
     
-#     tubeset: Mapped[str] = self._string_20
-#     crown_type: Mapped[str] = _string_10
-#     dropout_manufacturer: Mapped[str] = self._string_20
-#     dropout_type: Mapped[str]
+    material_tier: Mapped[str_20]
+    crown_type: Mapped[str_20]
+    dropout_manufacturer: Mapped[str_20]
+    dropout_type: Mapped[str_20]
 
-#     steerer_length_mm: Mapped[float] = self._float_2
-#     threaded_length_mm: Mapped[float] = self._float_2
-#     blade_length_mm: Mapped[float] = self._float_2
-#     crown_width_mm: Mapped[float] = self._float_2
-#     spacing_mm: Mapped[float] = self._float_2
+    steerer_length_mm: Mapped[float_2]
+    threaded_length_mm: Mapped[float_2]
+    blade_length_mm: Mapped[float_2]
+    crown_width_mm: Mapped[float_2]
+    spacing_mm: Mapped[float_2]
     
-#     offset_rake: Mapped[float] = self._float_2
-#     trail: Mapped[str] = self._float_2
-#     weight_g: Mapped[float] = self._float_2
+    offset_rake: Mapped[float_2]
+    trail: Mapped[str_20]
+    weight_g: Mapped[float_2]
+    
+    def __repr__(self):
+        return self._set_repr()
     
 # class Seatpost(Base):
 #     __tablename__ = "seatposts"
@@ -232,3 +238,16 @@ class Frame(Base):
 #     clamp_diameter: Mapped[float] = self._float_2
 #     weight_g: Mapped[float] = self._float_2
 
+class Bike(Base):
+    def __init__(self):
+        super().__init__()
+    
+    __tablename__ = "bikes"
+
+    purchase_date: Mapped[date] = mapped_column(ForeignKey("base.purchase_date"))
+    frame_serial: Mapped[str_20] = mapped_column(primary_key=True)
+    frame_size_cm: Mapped[float_2]
+    frame_material: Mapped[str_10]
+
+    def __repr__(self):
+        return self._set_repr()
