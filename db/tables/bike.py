@@ -74,7 +74,6 @@ class Base(AnnotationBase):
         _annotations.update(self._locals['__annotations__'])
         repr_head = f"<{self.__class__.__name__}("
         repr_body_list = [f'{k}={v}' for k, v in _annotations.items()]
-        repr_body_list = [f'{k}={v}' for k, v in _annotations.items()]
         repr_body = ','.join(repr_body_list)
         repr_tail = ')>'
         repr = ''.join([repr_head, repr_body, repr_tail])
