@@ -1,12 +1,12 @@
 #!/media/jll/Occam/dev/sandbox/bikedb/.venv/bin/python3
 
 from datetime import date
-
-from inspect import get_annotations
+from hashlib import sha1
 
 from sqlalchemy import ForeignKey
 from sqlalchemy import String, Integer, Float
 from sqlalchemy import JSON, ARRAY
+from sqlalchemy import ExecutionContext
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -14,27 +14,35 @@ from sqlalchemy.orm import relationship
 
 from typing import Any, Annotated
 
-from jllogging import JLLogger
-
 # type annotations, not necessary, but nice to have:
 float_2 = Annotated[float, 2]
+str_40 = Annotated[str, 40]
 str_20 = Annotated[str, 20]
 str_10 = Annotated[str, 10]
 year = Annotated[int, 4]
 
+def print_context(context: ExecutionContext) -> None:
+    print(f'context parameters:')
+    for k, v in context.get_current_parameters().items():
+        print(f'    {k}: {v}')
 
-def log_setup() -> JLLogger:
-    logger = JLLogger('bike_db')
-    logger.terminal_setup(10)
-    logger.file_setup('bikedb.log', 10)
-    return logger
-
-logger = log_setup()
+def hash_id(context):
+    hash_keys = [
+        'production_year', 
+        'manufacturer', 
+        'model_name', 
+        'purchase_date'
+    ]
+    hashstring = ''
+    for key in hash_keys:
+        hash_string += f'_{context.get_current_parameters()[key]}'
+        id = sha1(hash_string.encode()).hexdigest()
+        return id
 
 class AnnotationBase(DeclarativeBase):
 
-    logger.debug(f'seting type annotation_map:')
     type_annotation_map = {
+        str_40: String(40),
         str_20: String(20),
         str_10: String(10),
         float_2: Float(precision=2),
@@ -50,17 +58,19 @@ class Base(AnnotationBase):
         super().__init__()
     
     __abstract__ = True
-    #__tablename__ = "base"
-
-    logger.debug(f'creating default columns')
     
+    id: Mapped[str_40] = mapped_column(primary_key=True, default=hash_id)
     production_year: Mapped[year]
     manufacturer: Mapped[str_20]
     model_name: Mapped[str_20]
     stamped_codes: Mapped[dict[str, Any]]
     style: Mapped[str_20]
+    features: Mapped[dict[str, Any]]
 
-    #built_weight_kg: Mapped[float_2]
+    material: Mapped[dict[str, Any]]
+    weight_spec_g: Mapped[float_2]
+    weight_actual_g: Mapped[float_2]
+
     purchase_date: Mapped[date]
     purchase_price: Mapped[float_2]
     value_low_usd: Mapped[float_2]
@@ -69,37 +79,62 @@ class Base(AnnotationBase):
     
     _locals = locals()
 
-    def _set_repr(self) -> None:
+    def _generate_id() -> str:
+        id = sha1(f'')
+
+    def _get_annotations(self) -> dict:
         _annotations = self.__annotations__
         _annotations.update(self._locals['__annotations__'])
+
+        # check to see if it's more efficient to call this once from the 
+        # class-scope and use the variable multiple times, or if it's 
+        # better to call this on-demand.
+        # presumably, on-demand makes the most sense, unless both of the
+        # functions that use this are used frequently.
+        return _annotations
+
+    def get_columns(self) -> None:
+        _annotations = self._get_annotations()
+        print(f'{self.__class__.__name__}:')
+        for k, v in _annotations.items():
+            print(f'    {k}: {v}')
+
+    def __repr__(self) -> str:
+        """Set __repr__ output to include all columns of a derived class.
+        
+        returns: 
+            - repr: string representation of object in __repr__ format
+        """
+        _annotations = self._get_annotations()
         repr_head = f"<{self.__class__.__name__}("
         repr_body_list = [f'{k}={v}' for k, v in _annotations.items()]
         repr_body = ','.join(repr_body_list)
         repr_tail = ')>'
         repr = ''.join([repr_head, repr_body, repr_tail])
         return repr
-
-    def __repr__(self):
-        return self._set_repr()
     
-class Frame(Base):
+class ComponentBase(Base):
     def __init__(self):
         super().__init__()
-
+    
+    __abstract__ = True
+    
+    frame_serial: Mapped[str_20] = mapped_column(ForeignKey('frames.serial'))
+    manufacturer: Mapped[str_20] = mapped_column(primary_key=True)
+    component_group: Mapped[str_20] = mapped_column(primary_key=True)
+    model_name: Mapped[list[str]] = mapped_column(primary_key=True)
+    stamped_codes: Mapped[dict[str, Any]] = mapped_column(primary_key=True)
+    
+class Frame(Base):
     __tablename__ = "frames"
 
     # Basic attributes
     serial: Mapped[str_20] = mapped_column(primary_key=True)
     serial_location: Mapped[str_20]
-    #stamped_codes: Mapped[dict[str, Any]]
     brand: Mapped[str_20]
-    #manufacturer: Mapped[str_20]
-    #production_year: Mapped[year]
     model_year: Mapped[int]
     model_name: Mapped[str_20]
-    #style: Mapped[str_20]
     
-    material: Mapped[str_20]
     material_manufacturer: Mapped[str_20]
     material_tier: Mapped[str_20]
     dropout_manufacturer: Mapped[str_20]
@@ -142,32 +177,12 @@ class Frame(Base):
     chain_stay_wall_thickness: Mapped[list[float_2]]
     chain_stay_features: Mapped[dict[str, Any]]
 
-    weight_spec_g: Mapped[float_2]
-    weight_actual_g: Mapped[float_2]
-
-    #purchase_date: Mapped[date]
-    #purchase_price: Mapped[float_2]
-    
-    #value_low_usd: Mapped[float_2]
-    #value_avg_usd: Mapped[float_2]
-    #value_high_usd: Mapped[float_2]
-
-    def __repr__(self):
-        return self._set_repr()
-
 class Fork(Base):
     __tablename__ = "forks"
 
-    
-    #purchase_date: Mapped[date]
-    #production_year: Mapped[year]
+    manufacturer: Mapped[str_20] = mapped_column(primary_key=True)
     stamped_codes: Mapped[dict[str, Any]] = mapped_column(primary_key=True)
     frame_serial: Mapped[str_20] = mapped_column(ForeignKey('frames.serial'))
-    #production_year: Mapped[int]
-    #manufacturer: Mapped[str_20]
-    #model_name: Mapped[str_20]
-    material: Mapped[str_20]
-    #style: Mapped[str_20]
     
     material_tier: Mapped[str_20]
     crown_type: Mapped[str_20]
@@ -182,71 +197,81 @@ class Fork(Base):
     
     offset_rake: Mapped[float_2]
     trail: Mapped[str_20]
-    weight_g: Mapped[float_2]
     
-    def __repr__(self):
-        return self._set_repr()
+class SeatPost(ComponentBase):
+    __tablename__ = "seatposts"
     
-# class Seatpost(Base):
-#     __tablename__ = "seatposts"
+    length_mm: Mapped[float_2]
+    diameter_mm: Mapped[float_2]
+    clamp_type: Mapped[str_20]
 
-#     frame_serial: Mapped[str] = self._string_primary
-#     production_year: Mapped[int] = self._integer
-#     manufacturer: Mapped[str] = self._string_20
-#     model_name: Mapped[str] = self._string_20
-#     stamped_codes: Mapped[ARRAY] = self._array
-#     material: Mapped[str] = _string_10
+class Saddle(ComponentBase):
+    __tablename__ = "saddles"
+   
+    dimensions_lwh_cm: Mapped[list[int]]
+
+class Stem(ComponentBase):
+    __tablename__ = "stems"
+
+    quill_style: Mapped[str_20]
+
+    height_mm: Mapped[float_2]
+    reach_mm: Mapped[float_2]
+    quill_diameter_mm: Mapped[float_2]
+    steerer_diameter_mm: Mapped[float_2]
+    clamp_diameter: Mapped[float_2]
+
+class HandleBars(ComponentBase):
+    __tablename__ = 'handlebars'
+    dimensions: Mapped[dict[str, Any]]
+    clamping_diameter: Mapped[float_2]
+    bar_diameter: Mapped[float_2]
+
+class BrakeLevers(ComponentBase):
+    __tablename__ = 'brake_levers'
     
-#     diameter_mm: Mapped[float] = self._float_2
-#     clamp_type: Mapped[str] = self._string_20
-#     weight_g: Mapped[float] = self._float_2
+    bar_type: Mapped[str_20]
+    clamp_size: Mapped[float_2]
+    lever_color: Mapped[str_10]
+    hood_color: Mapped[str_10]
 
-
-
-# class Saddle(Base):
-#     __tablename__ = "saddles"
-
-#     frame_serial: Mapped[str] = self._string_20
-#     production_year: Mapped[int] = self._integer
-#     manufacturer: Mapped[str] = self._string_20
-#     model_name: Mapped[str] = self._string_20
-#     stamped_codes: Mapped[ARRAY] = self._array
-
-#     rail_material: Mapped[str] = _string_10
-#     base_material: Mapped[str] = _string_10
-#     cushion_material: Mapped[str] = _string_10
-#     dimensions_lwh_cm: Mapped[ARRAY] = self._array
-#     weight_g: Mapped[float] = self._float_2
-
-# class Stem(Base):
-#     __tablename__ = "stems"
-
-#     frame_serial: Mapped[str] = self._string_20
-#     production_year: Mapped[int] = self._integer
-#     manufacturer: Mapped[str] = self._string_20
-#     model_name: Mapped[str] = self._string_20
-#     stamped_codes: Mapped[ARRAY] = self._array
-
-#     style: Mapped[str] = self._string_20
-#     quill_style: Mapped[str] = self._string_20
-
-#     height_mm: Mapped[float] = self._float_2
-#     length_mm: Mapped[float] = self._float_2
-#     quill_diameter_mm: Mapped[float] = self._float_2
-#     steerer_diameter_mm: Mapped[float] = self._float_2
-#     clamp_diameter: Mapped[float] = self._float_2
-#     weight_g: Mapped[float] = self._float_2
-
-class Bike(Base):
-    def __init__(self):
-        super().__init__()
+class Brakes(ComponentBase):
+    __tablename__ = 'brakes'
     
-    __tablename__ = "bikes"
+    actuation_type: Mapped[str_20]
+    features: Mapped[dict[str, Any]]
+    
+class Shifters(ComponentBase):
+    __tablename__ = 'shifters'
+    
+    indexed: Mapped[bool]
+    capacity: Mapped[int]
+    mount_type: Mapped[str_20]
 
-    purchase_date: Mapped[date] = mapped_column(ForeignKey("base.purchase_date"))
-    frame_serial: Mapped[str_20] = mapped_column(primary_key=True)
-    frame_size_cm: Mapped[float_2]
-    frame_material: Mapped[str_10]
+class DerailleurFront(ComponentBase):
+    __tablename__ = 'front_derailleur'
+    
+    capacity: Mapped[int]
+    mount_type: Mapped[str_20]
 
-    def __repr__(self):
-        return self._set_repr()
+class DerailleurRear(ComponentBase):
+    __tablename__ = 'rear_derailleur'
+    
+    capacity: Mapped[int]
+    mount_type: Mapped[str_20]
+    
+    cage_type: Mapped[str_10]
+    sprocket_diameter_mm: Mapped[float_2]
+    sprocket_tooth_qty: Mapped[int]
+    sprocket_bearing_type: Mapped[str_20]
+
+class Crankset(ComponentBase):
+    __tablename__ = 'crankset'
+    
+    arm_length_mm: Mapped[float_2]
+    bb_type: Mapped[str_20]
+    spindle_type: Mapped[str_20]
+    chainring_bolt_qty: Mapped[int]
+    bolt_circle_diameter: Mapped[float_2]
+    chainring_qty: Mapped[int]
+    pedal_thread: Mapped[str_10]
