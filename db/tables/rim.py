@@ -1,8 +1,8 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -29,5 +29,3 @@ class Rim(ComponentBase):
     valve_type: Mapped[str_10]
     internal_width_mm: Mapped[float_2]
     external_width_mm: Mapped[float_2]
-
-    frame: Mapped['Frame'] = relationship(back_populates='rim')

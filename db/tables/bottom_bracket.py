@@ -1,8 +1,8 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -26,5 +26,3 @@ class BottomBracket(ComponentBase):
     spindle_material: Mapped[str_20]
     spindle_length_mm: Mapped[float_2]
     crank_mount_type: Mapped[str_20]
-
-    frame: Mapped['Frame'] = relationship(back_populates='bottom_bracket')

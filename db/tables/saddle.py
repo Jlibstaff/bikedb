@@ -1,8 +1,8 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -22,5 +22,3 @@ class Saddle(ComponentBase):
     __tablename__ = "saddle"
    
     dimensions_lwh_cm: Mapped[list[int]]
-
-    frame: Mapped['Frame'] = relationship(back_populates='saddle')

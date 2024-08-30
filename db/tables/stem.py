@@ -1,8 +1,8 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -28,5 +28,3 @@ class Stem(ComponentBase):
     quill_diameter_mm: Mapped[float_2]
     steerer_diameter_mm: Mapped[float_2]
     clamp_diameter: Mapped[float_2]
-
-    frame: Mapped['Frame'] = relationship(back_populates='stem')

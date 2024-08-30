@@ -1,8 +1,8 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -28,5 +28,3 @@ class Crankset(ComponentBase):
     bolt_circle_diameter: Mapped[float_2]
     chainring_qty: Mapped[int]
     pedal_thread: Mapped[str_10]
-
-    frame: Mapped['Frame'] = relationship(back_populates='crankset')

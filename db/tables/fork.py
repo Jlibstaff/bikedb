@@ -1,10 +1,10 @@
 from ._table_bases import Base
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -40,6 +40,4 @@ class Fork(Base):
     
     offset_rake: Mapped[float_2]
     trail: Mapped[str_20]
-
-    frame: Mapped['Frame'] = relationship(back_populates='fork')
     

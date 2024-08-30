@@ -1,8 +1,8 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -23,5 +23,3 @@ class DerailleurFront(ComponentBase):
     
     capacity: Mapped[int]
     mount_type: Mapped[str_20]
-
-    frame: Mapped['Frame'] = relationship(back_populates='derailleur_front')

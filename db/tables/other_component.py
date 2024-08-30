@@ -20,5 +20,3 @@ year = Annotated[int, 4]
 
 class OtherComponent(ComponentBase):
     __tablename__ = 'other_component'
-
-    frame: Mapped['Frame'] = relationship(back_populates='other_component')

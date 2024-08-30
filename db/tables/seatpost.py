@@ -1,10 +1,10 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
-from sqlalchemy import ForeignKey
+#from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import mapped_column
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -26,6 +26,3 @@ class SeatPost(ComponentBase):
     length_mm: Mapped[float_2]
     diameter_mm: Mapped[float_2]
     clamp_type: Mapped[str_20]
-
-    frame: Mapped['Frame'] = relationship(back_populates='seatpost')
-

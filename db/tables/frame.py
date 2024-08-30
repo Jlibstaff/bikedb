@@ -1,12 +1,8 @@
 from ._table_bases import Base
-from .fork import Fork
-from .seatpost import SeatPost
-from .saddle import Saddle
-from .stem import Stem
 
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -73,8 +69,3 @@ class Frame(Base):
     chain_stay_diameter_mm: Mapped[float_2]
     chain_stay_wall_thickness: Mapped[list[float_2]]
     chain_stay_features: Mapped[dict[str, Any]]
-
-    fork: Mapped['Fork'] = relationship(back_populates='frame')
-    seatpost: Mapped['SeatPost'] = relationship(back_populates='frame')
-    saddle: Mapped['Saddle'] = relationship(back_populates='frame')
-    stem: Mapped['Stem'] = relationship(back_populates='frame')

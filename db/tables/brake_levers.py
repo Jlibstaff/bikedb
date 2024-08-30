@@ -1,8 +1,8 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -25,5 +25,3 @@ class BrakeLevers(ComponentBase):
     clamp_size: Mapped[float_2]
     lever_color: Mapped[str_10]
     hood_color: Mapped[str_10]
-
-    frame: Mapped['Frame'] = relationship(back_populates='brake_levers')

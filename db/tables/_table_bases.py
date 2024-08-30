@@ -5,11 +5,11 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import String, Integer, Float
 from sqlalchemy import JSON, ARRAY
 from sqlalchemy import ExecutionContext
-from sqlalchemy.orm import declared_attr
+#from sqlalchemy.orm import declared_attr
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -148,7 +148,7 @@ class ComponentBase(Base):
     model_name: Mapped[list[str]] = mapped_column(primary_key=True)
     stamped_codes: Mapped[dict[str, Any]] = mapped_column(primary_key=True)
 
-    @declared_attr
-    def frame(self) -> Mapped['Frame']:
-        return relationship(back_populates=self._get_relationship_name(self))
+    # @declared_attr
+    # def frame(self) -> Mapped['Frame']:
+    #     return relationship(back_populates=self._get_relationship_name(self))
     

@@ -1,8 +1,8 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -23,5 +23,3 @@ class Pedal(ComponentBase):
 
     toe_clips: Mapped[bool]
     clip_cleat_type: Mapped[str_20]
-
-    frame: Mapped['Frame'] = relationship(back_populates='pedal')

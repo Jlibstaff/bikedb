@@ -1,8 +1,8 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -24,5 +24,3 @@ class FreewheelCasette(ComponentBase):
     gear_qty: Mapped[int]
     low_teeth: Mapped[int]
     high_teeth: Mapped[int]
-
-    frame: Mapped['Frame'] = relationship(back_populates='derailleur_rear')

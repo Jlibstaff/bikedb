@@ -1,8 +1,8 @@
 from ._table_bases import ComponentBase
-from .frame import Frame
+#from .frame import Frame
 
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+#from sqlalchemy.orm import relationship
 
 from typing import (
     Any, 
@@ -28,5 +28,3 @@ class DerailleurRear(ComponentBase):
     sprocket_diameter_mm: Mapped[float_2]
     sprocket_tooth_qty: Mapped[int]
     sprocket_bearing_type: Mapped[str_20]
-
-    frame: Mapped['Frame'] = relationship(back_populates='derailleur_rear')
