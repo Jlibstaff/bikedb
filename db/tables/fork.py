@@ -25,7 +25,7 @@ class Fork(Base):
 
     manufacturer: Mapped[str_20] = mapped_column(primary_key=True)
     stamped_codes: Mapped[dict[str, Any]] = mapped_column(primary_key=True)
-    frame_serial: Mapped[str_20] = mapped_column(ForeignKey('frame.serial'))
+    frame_serial: Mapped[str_20] = mapped_column()
    
     material_tier: Mapped[str_20]
     crown_type: Mapped[str_20]

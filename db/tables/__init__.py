@@ -1,6 +1,9 @@
+from ._table_bases import Base
+from ._table_bases import ComponentBase
 from .bottom_bracket import BottomBracket
 from .brake_levers import BrakeLevers
 from .brakes import Brakes
+from .chainring import ChainRing
 from .crankset import Crankset
 from .derailleur_front import DerailleurFront
 from .derailleur_rear import DerailleurRear
@@ -21,6 +24,7 @@ __all__ = [
     BottomBracket,
     BrakeLevers,
     Brakes,
+    ChainRing,
     Crankset,
     DerailleurFront,
     DerailleurRear,
