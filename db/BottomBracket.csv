@@ -1,0 +1,3 @@
+threading|bearing_type|spindle_material|spindle_length_mm|crank_mount_type|id|frame_serial|production_year|manufacturer|component_group|model_name|stamped_codes|style|features|material|weight_spec_g|weight_actual_g|purchase_date|purchase_price|value_low_usd|value_avg_usd|value_high_usd
+BSA|cup and cone|chromoly|113|square taper – JIS||N0D5258||Shimano|600 tricolor|BB-6400|||{“bearing_size”: “1/4in”, “ball_qty”: “11x11”}||293||2019-06-29||30|45|37.5
+BSA|sealed bearing|chromoly|102|square taper – ISO||75501||Origin8||Torqlite|{“fixed_cup”: [“R.O.C patent#216105”, “BSA 1.37\”X24T-LH-11A”, “<50Nm”], “removeable_cup”: {“bearing_dust_shield”: “6002RS-16”}}|||{“cups”: “forged alloy”, “body: “forged alloy”}|230|210.6|2024-08-01||17.95|40.59|48.28

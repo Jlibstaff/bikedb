@@ -11,6 +11,7 @@ from .fork import Fork
 from .frame import Frame
 from .freewheel_casette import FreewheelCasette
 from .handlebars import HandleBars
+from .headset import HeadSet
 from .hub import Hub
 from .other_component import OtherComponent
 from .pedal import Pedal
@@ -32,6 +33,7 @@ __all__ = [
     Frame,
     FreewheelCasette,
     HandleBars,
+    HeadSet,
     Hub,
     OtherComponent,
     Pedal,
