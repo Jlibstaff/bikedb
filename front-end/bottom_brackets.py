@@ -2,9 +2,9 @@ import mesop as me
 
 from dataclasses import dataclass
 
-import components
+import bottom_brackets
 
-CARD_WIDTH = "460px"
+CARD_WIDTH = "95%"
 HOME_URL = "/"
 
 
@@ -12,7 +12,7 @@ HOME_URL = "/"
 class Resource:
   title: str
   description: str
-  link: str
+  links: tuple[str]
   img_url: str
   
 
@@ -26,75 +26,18 @@ class Section:
 
 SECTIONS = [
   Section(
-    name="Featured",
+    name="Bottom Brackets",
     icon="star",
     resources=[
       Resource(
-        title="Components",
-        description="Browse or search components and groupsets",
-        img_url="https://bicyclecollective.org/products/bianchi-2x-crank-170-52-42-square-taper",
-        link="/components",
-      ),
-      Resource(
-        title="Framesets and Complete Bikes",
-        description="Browse or search framesets and stock bikes.",
-        img_url="https://d1mgeijqpfaspl.cloudfront.net/uploads/bike/media/918316/89fa0f6d-fcc2-45ba-9e62-fb9f21a16935.webp",
-        link="/framesets",
-      ),
-      Resource(
-        title="Documents",
-        description="Catalogs and other documents",
-        img_url="https://www.vintagecenturion.com/literature/images/1978_Cover.jpg",
-        link="/catalogs",
-      ),
-    ],
-  ),
-  Section(
-    name="Resources",
-    icon="computer",
-    resources=[
-      Resource(
-        title="Velobase",
-        description="The original, crowd sourced bike and component database",
-        img_url="https://velobase.com/App_Themes/VeloBase2_blue/Images/VeloBase2TitleCampagnolo.jpg",
-        link="https://velobase.com"
-      ),
-      Resource(
-        title="Bikeforums",
-        description="Massive forum with archives spanning decades",
-        img_url="https://www.bikeforums.net/images/bflogo.png",
-        link="https://bikeforums.org"
-      ),
-      Resource(
-        title="Sheldon Brown",
-        description="loosely organized cycling encyclopedia",
-        img_url="https://github.com/richard-to/mesop-jeopardy/assets/539889/bc27447d-129f-47ae-b0b1-8f5c546762ed",
-        link="https://www.sheldonbrown.com"
-      ),
-    ],
-  ),
-  Section(
-    name="Shopping",
-    icon="code_blocks",
-    resources=[
-      Resource(
-        title="eBay",
-        description="eBay",
-        img_url="https://seeklogo.com/images/E/ebay-icon-logo-EA65D4EEE0-seeklogo.com.png",
-        link="https://www.ebay.com"
-      ),
-      Resource(
-        title="fb Marketplace",
-        description="Facebook Marketplace",
-        img_url="https://images.ctfassets.net/592afn1s36ry/m88x2nlTyzpQ0N21Hk8nU/4402886cf4e1d8e46ac4c8554c6c3c14/Screenshot_2024-07-23_at_2.20.25_PM.png",
-        link=HOME_URL #"https://www.facebook.com/marketplace/"
-      ),
+        title="Full List",
+        description="here's a full list of bottom brackets. Let's add some filters and things here.",
+        links=('/components/bottom-brackets'),
+        img_url="",
+      )
     ],
   ),
 ]
-
-def _navigate(link: str):
-  me.navigate(link)
 
 def scroll_to_section(e: me.ClickEvent):
   me.scroll_into_view(key="section-" + e.key)
@@ -129,7 +72,7 @@ def is_mobile():
 @me.page(
   title="bikeDB",
   on_load=on_load,
-  path="/",
+  path="/components/bottom-brackets",
 )
 def page():
   # Menu bar
@@ -217,9 +160,9 @@ def page():
           # Tiles
           with me.box(
             style=me.Style(
-              display="flex",
-              justify_content="space-around",
-              #grid_template_columns=f"repeat(auto-fit, minmax({CARD_WIDTH}, 1fr))",
+              display="grid",
+              #justify_content="space-around",
+              grid_template_columns=f"repeat(auto-fit, minmax({CARD_WIDTH}, 1fr))",
               gap=24,
               margin=me.Margin(
                 bottom=24,
@@ -310,10 +253,7 @@ def card(resource: Resource):
         border_radius=16,
         margin=me.Margin(bottom=8),
       ),
-      key=resource.link,
-      on_click=lambda e: me.navigate(e.key),
     )
-    # tile box
     with me.box(
       style=me.Style(
         padding=me.Padding(left=16),
@@ -321,15 +261,12 @@ def card(resource: Resource):
         flex_direction="column",
         gap=8,
       ),
+      key=resource.links,
+      on_click=lambda e: me.navigate(e.key),
     ):
-      def _on_click(e: me.ClickEvent):
-        # state = me.state(State)
-        # state.count += 1
-        key=resource.link
-        me.navigate(resource.link)
       me.button(
         resource.title, 
         style=me.Style(font_weight="bold"), 
-        key=resource.link,
+        key=resource.links,
         on_click=lambda e: me.navigate(e.key))
       me.text(resource.description, style=me.Style(height=40))
